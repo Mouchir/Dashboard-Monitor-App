@@ -3,41 +3,49 @@ package com.moch.monitorapp.model;
 import org.springframework.http.HttpStatus;
 
 import java.net.URL;
-import java.time.LocalDateTime;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 public class MonitoredService {
 
     private String name;
     private String description;
     private URL url;
-    private LocalDateTime timeStamp;
 
     private ServiceStatus status;
     private HttpStatus httpStatus;
     private Long responseTime;        // between 50 and 2000 ms
+    private Deque<History> historyQueue = new ArrayDeque<>();
+    
 
-    //  ADD HISTORY HERE
+    public MonitoredService(String name, String description, URL url) {
 
-    public MonitoredService(String name, String description, URL url, LocalDateTime timeStamp) {
-
-        checkParameterValidity(name,description,url,timeStamp);
+        checkParameterValidity(name,description,url);
 
         this.name = name;
         this.description = description;
         this.url = url;
-        this.timeStamp = timeStamp;
         
         this.status = ServiceStatus.UNKNOWN;
         this.httpStatus = HttpStatus.OK;
         this.responseTime = null;
     }
 
-    private void checkParameterValidity(String name, String description, URL url, LocalDateTime timeStamp){
+    private void checkParameterValidity(String name, String description, URL url){
         this.setName(name);
         this.setDescription(description);
         this.setUrl(url);
-        this.setTimeStamp(timeStamp);
     }
+    
+    public void updateHistory(History newHistory){
+
+        historyQueue.addLast(newHistory);
+
+        if(historyQueue.size() > 15)
+            historyQueue.removeFirst();
+    }
+
+    
 
     public String getName() {
         return name;
@@ -112,14 +120,4 @@ public class MonitoredService {
         this.responseTime = responseTime;
     }
 
-    public LocalDateTime getTimeStamp() {
-        return timeStamp;
-    }
-
-    public void setTimeStamp(LocalDateTime timeStamp) {
-        if(timeStamp == null)
-            throw new NullPointerException("TimeStamp Cannot be null");
-        
-        this.timeStamp = timeStamp;
-    }
 }
