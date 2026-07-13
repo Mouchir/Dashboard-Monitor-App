@@ -30,7 +30,11 @@ public final class MetaData {
         return MetaData.instance;
     }
     
-    private static List<MonitoredService> loadServices() throws MalformedURLException {
+    public static List<MonitoredService> getMonitoredServicesList(){
+        return Collections.unmodifiableList(monitoredServiceList);
+    }
+    
+    private static void loadServices() throws MalformedURLException {
 
         monitoredServiceList.add(
                 new MonitoredService("API-COMPTE","Gestion des comptes courants",
@@ -72,7 +76,6 @@ public final class MetaData {
                 new MonitoredService("API-NOTIFICATION","Envoi de notifications",
                         new URL("http://preprod-api-10:8090/actuator/health")));
         
-        return Collections.unmodifiableList(monitoredServiceList);
     }
     
 }

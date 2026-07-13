@@ -10,7 +10,7 @@ public class History {
     private LocalDateTime timeStamp;
 
     private ServiceStatus serviceStatus;
-    private HttpStatus httpStatus;
+    private int httpStatusCode;
     private Long responseTime;
 
     public History(MonitoredService monitoredService){
@@ -19,7 +19,7 @@ public class History {
         this.timeStamp = LocalDateTime.now();
         
         this.serviceStatus = monitoredService.getStatus();
-        this.httpStatus = monitoredService.getHttpStatus();
+        this.httpStatusCode = monitoredService.getHttpStatusCode();
         this.responseTime = monitoredService.getResponseTime();
     }
 
@@ -47,12 +47,12 @@ public class History {
         this.serviceStatus = serviceStatus;
     }
 
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
+    public int getHttpStatus() {
+        return httpStatusCode;
     }
 
-    public void setHttpStatus(HttpStatus httpStatus) {
-        this.httpStatus = httpStatus;
+    public void setHttpStatus(int httpStatusCode) {
+        this.httpStatusCode = httpStatusCode;
     }
 
     public Long getResponseTime() {

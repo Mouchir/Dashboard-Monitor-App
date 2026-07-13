@@ -13,9 +13,9 @@ public class MonitoredService {
     private URL url;
 
     private ServiceStatus status;
-    private HttpStatus httpStatus;
+    private int httpStatusCode;
     private Long responseTime;        // between 50 and 2000 ms
-    private Deque<History> historyQueue = new ArrayDeque<>();
+    private final Deque<History> historyQueue = new ArrayDeque<>();
     
 
     public MonitoredService(String name, String description, URL url) {
@@ -27,7 +27,7 @@ public class MonitoredService {
         this.url = url;
         
         this.status = ServiceStatus.UNKNOWN;
-        this.httpStatus = HttpStatus.OK;
+        this.httpStatusCode = 200;  // OK STATUS
         this.responseTime = null;
     }
 
@@ -96,15 +96,15 @@ public class MonitoredService {
         this.status = status;
     }
 
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
+    public int getHttpStatusCode() {
+        return httpStatusCode;
     }
 
-    public void setHttpStatus(HttpStatus httpStatus) {
-        if(httpStatus == null)
-            throw new NullPointerException("HttpStatus Cannot be null");
+    public void setHttpStatusCode(int httpStatusCode) {
+        if(httpStatusCode < 0)
+            throw new IllegalArgumentException("httpStatusCode Cannot be of negative value (httpStatusCode = "+httpStatusCode+" ms)");
 
-        this.httpStatus = httpStatus;
+        this.httpStatusCode = httpStatusCode;
     }
 
     public Long getResponseTime() {
@@ -120,4 +120,7 @@ public class MonitoredService {
         this.responseTime = responseTime;
     }
 
+    public Deque<History> getHistoryQueue() {
+        return historyQueue;
+    }
 }
