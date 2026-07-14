@@ -1,6 +1,7 @@
 package com.moch.monitorapp.ressources;
 
 import com.moch.monitorapp.model.MonitoredService;
+import org.springframework.stereotype.Component;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,12 +13,12 @@ import java.util.List;
  * This Class contains Metadata about APIs and Services (name, description, URL ...)
  * This Class is a Singleton*/
 
-public final class MetaData {
+@Component
+public final class ServiceLoader {
+
+    private final List<MonitoredService> monitoredServiceList = new ArrayList<>();
     
-    private static final MetaData instance = new MetaData();
-    private static final List<MonitoredService> monitoredServiceList = new ArrayList<>();
-    
-    private MetaData(){
+    public ServiceLoader(){
         try{
             loadServices();
         }
@@ -26,15 +27,11 @@ public final class MetaData {
         }
     }
     
-    public static MetaData getInstance(){
-        return MetaData.instance;
-    }
-    
-    public static List<MonitoredService> getMonitoredServicesList(){
+    public List<MonitoredService> getMonitoredServicesList(){
         return Collections.unmodifiableList(monitoredServiceList);
     }
     
-    private static void loadServices() throws MalformedURLException {
+    private void loadServices() throws MalformedURLException {
 
         monitoredServiceList.add(
                 new MonitoredService("API-COMPTE","Gestion des comptes courants",

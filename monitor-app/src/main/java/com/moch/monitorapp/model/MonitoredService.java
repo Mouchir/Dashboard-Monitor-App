@@ -1,7 +1,5 @@
 package com.moch.monitorapp.model;
 
-import org.springframework.http.HttpStatus;
-
 import java.net.URL;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -121,6 +119,6 @@ public class MonitoredService {
     }
 
     public Deque<History> getHistoryQueue() {
-        return historyQueue;
+        return new ArrayDeque<>(historyQueue);
     }
 }

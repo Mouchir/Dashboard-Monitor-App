@@ -4,35 +4,123 @@ import com.moch.monitorapp.model.History;
 import com.moch.monitorapp.model.MonitoredService;
 import com.moch.monitorapp.model.ServiceStatus;
 import com.moch.monitorapp.model.ServiceType;
-import com.moch.monitorapp.ressources.MetaData;
+import com.moch.monitorapp.ressources.ServiceLoader;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  *  THIS CLASS IS SUPPOSED TO SIMULATE A MICRO-SERVICES ARCHITECTURE IN A MONOLITHIC WAY
  */
 
+@Service
 public class SimulatorService {
 
     private final Map<ServiceType,MonitoredService> monitoredServices = new HashMap<>();
-
-    public SimulatorService(){      //  LOAD THE CONSTRUCTOR WITH DATA AND INJECT IT LATER ON !
+    private final ServiceLoader serviceLoader;
+    
+    public SimulatorService(ServiceLoader metaData){      //  LOAD THE CONSTRUCTOR WITH DATA AND INJECT IT LATER ON !
+        this.serviceLoader = metaData;
         initServices();
     }
 
     private void initServices(){
         ServiceType[] tempServiceType = ServiceType.values();   //  extracts an array from the enum in an ordered way
-        List<MonitoredService> tempList = MetaData.getMonitoredServicesList();
+        List<MonitoredService> tempList = serviceLoader.getMonitoredServicesList();
         
         for(int i = 0 ; i < tempList.size() ; i++)
             monitoredServices.put(tempServiceType[i],tempList.get(i));
     }
+    
+    //  API FOR MAINCONTROLLER
 
+    public List<MonitoredService>getFullServicesStatus(){
+        return serviceLoader.getMonitoredServicesList();
+    }
+
+    public List<MonitoredService>findServicesByStatus(ServiceStatus serviceStatus){
+        if(serviceStatus == null)
+            return null;
+
+        List<MonitoredService> serviceList = new ArrayList<>();
+        for(MonitoredService monitoredService : serviceLoader.getMonitoredServicesList())
+            if(monitoredService.getStatus() == serviceStatus)
+                serviceList.add(monitoredService);
+
+        return Collections.unmodifiableList(serviceList);
+    }
+
+    public MonitoredService findServiceByName(String name){
+        if(name == null || name.isEmpty())
+            return null;
+        
+        for(MonitoredService monitoredService : serviceLoader.getMonitoredServicesList())
+            if(monitoredService.getName().equalsIgnoreCase(name))
+                return monitoredService;
+        
+        return null;
+    }
+
+    public Deque<History> fetchServiceHistory(String name){
+        MonitoredService monitoredService = findServiceByName(name);
+        if(monitoredService == null)
+            return null;
+        
+        return monitoredService.getHistoryQueue();
+    }
+
+    public Map<ServiceStatus,Double> fetchStatisticsAboutServices(){
+        
+        Map<ServiceStatus,Double> statsMap = new LinkedHashMap<>(); //  this maintains order + gives us Map behavior of Keys and Values
+        List<MonitoredService> tempList = serviceLoader.getMonitoredServicesList();
+
+        if(tempList == null || tempList.isEmpty())
+            return null;
+        
+        statsMap.put(ServiceStatus.UP,0d);
+        statsMap.put(ServiceStatus.DEGRADED,0d);
+        statsMap.put(ServiceStatus.DOWN,0d);
+        statsMap.put(ServiceStatus.TIMEOUT,0d);
+
+        ServiceStatus tempServiceStatus;
+        
+        for(MonitoredService monitoredService : tempList){
+            tempServiceStatus = monitoredService.getStatus();
+            switch(tempServiceStatus){
+                case UP :
+                    statsMap.put(ServiceStatus.UP,
+                            statsMap.get(ServiceStatus.UP) + 1);
+                    break;
+                case DEGRADED :
+                    statsMap.put(ServiceStatus.DEGRADED,
+                            statsMap.get(ServiceStatus.DEGRADED) + 1);
+                    break;
+                case DOWN :
+                    statsMap.put(ServiceStatus.DOWN,
+                            statsMap.get(ServiceStatus.DOWN) + 1);
+                    break;
+                case TIMEOUT:
+                    statsMap.put(ServiceStatus.TIMEOUT,
+                            statsMap.get(ServiceStatus.TIMEOUT) + 1);
+                    break;
+                default :   //  might produce undefined behavior incase of unknown/null ???
+                    System.out.println("Uninitiliazed ServiceStatus ??? ---> " + tempServiceStatus);
+            }
+        }
+        int numberOfServices = tempList.size();
+        for(ServiceStatus status : statsMap.keySet())
+            statsMap.put(status, (statsMap.get(status) / numberOfServices) * 100);
+        
+        return statsMap;
+    }
+    
+    //  -----------------------------------------------
+
+    @Scheduled(fixedRate = 120_000)     //  120 s --> 2 min
     public void updateAllMonitoredServices(){
-        for(MonitoredService monitoredService : MetaData.getMonitoredServicesList())
+        for(MonitoredService monitoredService : serviceLoader.getMonitoredServicesList())
             simulate(monitoredService);
         
     }
