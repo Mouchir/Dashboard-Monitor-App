@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang ="en">
+    <head>
+        <meta charset = "utf-8">
+        <title>Monitor Dashboard</title>
+    </head>
+
+    <body>
+        <h1>Bank Monitoring Dashboard</h1>
+        <div>
+            <h2>Statistics</h2>
+            <table border = "5">
+                <tr>
+                    <th>UP</th>
+                    <th>DEGRADED</th>
+                    <th>DOWN</th>
+                    <th>TIMEOUT</th>
+                </tr>
+                <tr id ="globalStatusData">
+                    
+                </tr>
+            </table>
+        </div>
+        
+        <div>
+            <h2>Services</h2>
+            <input id = "searchBoxServices" type="text" placeholder ="Search Services...">
+            <div id="displayAreaForSearchBox">
+
+            </div>
+        </div>
+
+        <div id ="latestReport">
+            <h2>Latest Reports</h2>
+            <table border ="5">
+
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>HTTP Code</th>
+                        <th>Response Time (ms)</th>
+                    </tr>
+                </thead>
+
+                <tbody id = "latestReportBody">
+                    <tr>
+                        
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+
+        <script src ="/script.js"></script>
+
+    </body>
+</html>

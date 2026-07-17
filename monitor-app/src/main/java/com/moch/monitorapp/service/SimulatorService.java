@@ -118,7 +118,7 @@ public class SimulatorService {
     
     //  -----------------------------------------------
 
-    @Scheduled(fixedRate = 120_000)     //  120 s --> 2 min
+    @Scheduled(fixedRate = 10_000)     //  120 s --> 2 min
     public void updateAllMonitoredServices(){
         for(MonitoredService monitoredService : serviceLoader.getMonitoredServicesList())
             simulate(monitoredService);
