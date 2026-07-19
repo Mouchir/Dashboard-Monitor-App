@@ -2,6 +2,26 @@
 // 
 // console.log(tableBody);
 
+async function mainVue(){
+    const body = document.getElementById("vue");
+    body.innerHTML = "";   //  flush old data
+    const services = await loadServices();
+
+    for(const service of services){
+        const card = document.createElement("div");
+        
+        card.innerHTML = `
+                    <h3>${service.name}</h3>
+                    <b>Description : </b> <strong>${service.description}</strong> <br>
+                    <b>Status : </b> <strong>${service.status}</strong> <br>
+                    <b>Response Time : </b> <strong>${service.responseTime}</strong> <br>
+                    <b>Last Check : </b> <strong>${service.timeStamp}</strong> <br>
+        `;
+        body.appendChild(card);
+    }
+
+}
+
 async function loadServices(){
     const response = await fetch("/api/services");
     return await response.json();
@@ -38,21 +58,65 @@ async function checkLatestReports(){
 
 async function loadStatistics(){
     const globalStatusArea = document.getElementById("globalStatusData");
+    const mainStatsArea = document.getElementById("stats");
+    
+    mainStatsArea.innerHTML = "";   //  flush old data
     globalStatusArea.innerHTML = "";   //  flush old data
+    
     const tempRow = document.createElement("tr");
 
-    const response = await fetch("/api/stats");
+    const response = await fetch("/api/services");
     const result = await response.json();
+
+    let counter = 0;
+    let averageResponseTime = 0;
+
+    let upCounter = 0;
+    let degradedCounter = 0;
+    let downCounter = 0;
+    let timeoutCounter = 0;
+
+    for(const service of result){
+        counter++;
+        averageResponseTime = averageResponseTime + service.responseTime;
+
+        switch(service.status){
+            case "UP":
+                upCounter++;
+                break;
+            case "DEGRADED":
+                degradedCounter++;
+                break;
+            case "DOWN":
+                downCounter++;
+                break;
+            case "TIMEOUT":
+                timeoutCounter++;
+                break;
+            default :
+                console.log("Error, this Service status does not match a real status --> " + service.status);
+        }
+    }
+
+    averageResponseTime = averageResponseTime / counter ;   
+    const nbrOfServices = document.createElement("h3");
+    const responseTimeOnAverage = document.createElement("h3");
+
+    nbrOfServices.textContent = "Number Of Services : " + counter;
+    responseTimeOnAverage.textContent = "Average Response Time : " + averageResponseTime;
 
     const upCell = document.createElement("td");
     const degradedCell = document.createElement("td");
     const downCell = document.createElement("td");
     const timeoutCell = document.createElement("td");
 
-    upCell.textContent = result.UP;
-    degradedCell.textContent = result.DEGRADED;
-    downCell.textContent = result.DOWN;
-    timeoutCell.textContent = result.TIMEOUT;
+    upCell.textContent = upCounter;
+    degradedCell.textContent = degradedCounter;
+    downCell.textContent = downCounter;
+    timeoutCell.textContent = timeoutCounter;
+
+    mainStatsArea.appendChild(nbrOfServices);
+    mainStatsArea.appendChild(responseTimeOnAverage);
 
     globalStatusArea.appendChild(upCell);
     globalStatusArea.appendChild(degradedCell);
@@ -90,15 +154,16 @@ async function requestServiceDetailsBySearch(){
 }
 
 async function main(){
-
+    mainVue();
     checkLatestReports();
     loadStatistics();
     requestServiceDetailsBySearch();
     
     setInterval(async() => {
+        await mainVue();
         await checkLatestReports();
         await loadStatistics();}
-    ,5000);
+    ,5_000);     //  5 seconds
 }
 
 main();
