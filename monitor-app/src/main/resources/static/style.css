@@ -1,0 +1,41 @@
+body{
+    font-family : Arial, Helvetica, sans-serif;
+    background-color:lightslategray;
+    margin: 0;
+    padding : 20px;
+}
+
+h1{
+    text-align : center;
+    color :darkgreen;
+}
+
+h2{
+    color :navy;
+    text-decoration: underline;
+    padding-bottom: 20px;
+    border-bottom: 10px solid navy;
+}
+
+.service-card{
+background:white;
+
+    border-radius:10px;
+    padding:20px;
+    margin:15px;
+    width:250px;
+
+    box-shadow:0 4px 8px rgba(0,0,0,0.15);
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.service-card:hover{
+    transform:translateY(-5px);
+}
+
+#vue{
+    display : flex;
+    flex-wrap : wrap;
+    gap : 20px;
+}

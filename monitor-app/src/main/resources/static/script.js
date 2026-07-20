@@ -2,29 +2,66 @@
 // 
 // console.log(tableBody);
 
+async function loadServices(){
+    const response = await fetch("/api/services");
+    return await response.json();
+}
+
 async function mainVue(){
     const body = document.getElementById("vue");
     body.innerHTML = "";   //  flush old data
     const services = await loadServices();
 
+    
+
     for(const service of services){
+
         const card = document.createElement("div");
+        card.addEventListener("click", () => {
+            showHistory(service);
+        });
         
+        card.className = "service-card";
+
         card.innerHTML = `
                     <h3>${service.name}</h3>
                     <b>Description : </b> <strong>${service.description}</strong> <br>
                     <b>Status : </b> <strong>${service.status}</strong> <br>
                     <b>Response Time : </b> <strong>${service.responseTime}</strong> <br>
-                    <b>Last Check : </b> <strong>${service.timeStamp}</strong> <br>
         `;
         body.appendChild(card);
     }
 
 }
 
-async function loadServices(){
-    const response = await fetch("/api/services");
-    return await response.json();
+async function showHistory(service){
+
+    const historyBody = document.getElementById("historyPane");
+    const title = document.getElementById("titleOfHistoryPane");
+    const content = document.getElementById("historyContent");
+
+    title.innerHTML = "";   //  flush old data
+    content.innerHTML = "";   //  flush old data
+    //historyBody.innerHTML = "";   //  flush old data
+
+    const historyQueue = service.historyQueue;
+    title.textContent = service.name;
+
+    for(const history of historyQueue){
+
+        const tempPane = document.createElement("div");
+        tempPane.innerHTML = `
+                    <br><br>
+                    <b>Status : </b> <strong>${history.serviceStatus}</strong> <br>
+                    <b>HTTP Status Code : </b> <strong>${history.httpStatus}</strong> <br>
+                    <b>Response Time : </b> <strong>${history.responseTime}</strong> <br>
+                    <b>Last Check : </b> <strong>${history.timeStamp}</strong> <br>
+                    <br><br>
+        `;
+        content.appendChild(tempPane);
+    }
+
+    historyBody.style.display = "block";
 }
 
 async function checkLatestReports(){
@@ -158,6 +195,10 @@ async function main(){
     checkLatestReports();
     loadStatistics();
     requestServiceDetailsBySearch();
+
+    document.getElementById("closePane").addEventListener("click", () =>{
+        document.getElementById("historyPane").style.display = "none";
+    });
     
     setInterval(async() => {
         await mainVue();

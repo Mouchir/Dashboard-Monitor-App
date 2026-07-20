@@ -3,6 +3,7 @@
     <head>
         <meta charset = "utf-8">
         <title>Monitor Dashboard</title>
+        <link rel = "stylesheet" href = "style.css">
     </head>
 
     <body>
@@ -10,13 +11,23 @@
         <h1>Bank Monitoring Dashboard</h1>
 
         <div>
-            <h2>Vue d'Ensemble</h2>
+            <h2>Vue d'Ensemble : </h2>
             <div id = "vue">
                 
             </div>
         </div>
 
-        <h2>Statistics</h2>
+        <h2>History : </h2>
+
+        <div id = "historyPane" style = "display: none;">
+            <h2 id = "titleOfHistoryPane"></h2>
+
+            <div id = "historyContent"></div>
+
+            <button id = "closePane">Close</button>
+        </div>
+
+        <h2>Statistics : </h2>
         
         <div id = "stats">
             
@@ -38,7 +49,7 @@
         </div>
         
         <div>
-            <h2>Services</h2>
+            <h2>Services : </h2>
             <input id = "searchBoxServices" type="text" placeholder ="Search Services...">
             <div id="displayAreaForSearchBox">
 
@@ -46,7 +57,7 @@
         </div>
 
         <div id ="latestReport">
-            <h2>Latest Reports</h2>
+            <h2>Latest Reports : </h2>
             <table border ="5">
 
                 <thead>
@@ -68,6 +79,7 @@
         </div>
 
         <script src ="/script.js"></script>
+
 
     </body>
 </html>
